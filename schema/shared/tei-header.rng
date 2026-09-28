@@ -150,6 +150,9 @@
       <optional>
         <attribute name="type"/>
       </optional>
+      <optional>
+        <attribute name="n"/>
+      </optional>
       <ref name="editorialDecl_p"/>
     </element>
   </define>
