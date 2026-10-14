@@ -629,6 +629,19 @@ not required) to decompose them with `<persName>`, `<forename>`, `<surname>`:
 <author><persName><forename>J.</forename> <surname>Smith</surname></persName></author>
 ```
 
+When a reference lists several authors, each one gets its own `<author>` element — even
+when the source packs them into a single comma-separated (or "and"/"&"-joined) run of
+names. This holds for any number of authors, so that every author is captured
+individually rather than the whole run being left as one approximated string (see
+[#48](https://github.com/mpilhlt/fossil/issues/48)):
+
+```xml
+<author>J. Jett</author>, <author>B. Capitanu</author>, <author>D. Kudeki</author>,
+<author>T. Cole</author>, <author>Y. Hu</author>, <author>P. Organisciak</author>,
+<author>T. Underwood</author>, <author>E. Dickson Koehl</author>,
+<author>R. Dubnicek</author>, <author>J. S. Downie</author>
+```
+
 **Titles.** `<title level="...">` classifies the title by the kind of work it names:
 
 | `@level` | Meaning |
@@ -690,6 +703,19 @@ under [Legal and Humanities Scholarship](#legal-and-humanities-scholarship): `DO
 prefixes like "URL:" and trailing periods. An identifier that occurs only inside the URL
 may be tagged in place with a nested `<idno>` (see
 [Data embedded in a title or URL](#data-embedded-in-a-title-or-url)).
+
+If the URL itself contains a DOI (e.g. `https://doi.org/10.1162/coli_a_00345` or
+`https://dx.doi.org/...`) and the reference does not also give the DOI separately as
+its own `<idno type="DOI">`, mark up the DOI portion of the URL text with an embedded
+`<idno type="DOI">`, nested inside the `<ptr type="web">`:
+
+```xml
+<ptr type="web" target="https://doi.org/10.1162/coli_a_00345">https://doi.org/<idno type="DOI">10.1162/coli_a_00345</idno></ptr>
+```
+
+If a separate, standalone `<idno type="DOI">` is already present elsewhere in the
+reference, leave the URL's `<ptr type="web">` as plain text instead — do not annotate
+the same DOI twice.
 
 **Miscellaneous note.** `<note type="report">` marks any note not covered by another
 tag — typically the type of report or thesis (e.g. "Ph.D. thesis", "Technical Report").
