@@ -634,10 +634,13 @@ not required) to decompose them with `<persName>`, `<forename>`, `<surname>`:
 | `@level` | Meaning |
 | --- | --- |
 | `a` | Article or chapter title (analytic) |
-| `j` | Journal title |
-| `m` | Monograph, proceedings, book, or thesis title |
+| `j` | Journal title, including the name of a blog |
+| `m` | Monograph, proceedings, book, or thesis title, including the name of a whole website |
 | `s` | Series title |
 | `u` | Unpublished work title |
+
+Web sources follow the same split: a website cited as a whole is `level="m"`, a blog is
+`level="j"`, and a single post or page within either is `level="a"`.
 
 An optional `@key` holds a short resolvable key for a named work (e.g. an abbreviation),
 so it can later be linked to an external database.
