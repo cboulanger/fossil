@@ -135,6 +135,8 @@ There are three exceptions to this main rule:
    >     <date>2017</date>
    > ```
 
+4. Never place a non-whitespace character outside of the direct child elements of `<text>`. All text content must be inside of one of them. 
+
 ## Document segmentation model
 
 > [!NOTE]
@@ -629,6 +631,19 @@ not required) to decompose them with `<persName>`, `<forename>`, `<surname>`:
 <author><persName><forename>J.</forename> <surname>Smith</surname></persName></author>
 ```
 
+When a reference lists several authors, each one gets its own `<author>` element — even
+when the source packs them into a single comma-separated (or "and"/"&"-joined) run of
+names. This holds for any number of authors, so that every author is captured
+individually rather than the whole run being left as one approximated string (see
+[#48](https://github.com/mpilhlt/fossil/issues/48)):
+
+```xml
+<author>J. Jett</author>, <author>B. Capitanu</author>, <author>D. Kudeki</author>,
+<author>T. Cole</author>, <author>Y. Hu</author>, <author>P. Organisciak</author>,
+<author>T. Underwood</author>, <author>E. Dickson Koehl</author>,
+<author>R. Dubnicek</author>, <author>J. S. Downie</author>
+```
+
 **Titles.** `<title level="...">` classifies the title by the kind of work it names:
 
 | `@level` | Meaning |
@@ -690,7 +705,22 @@ under [Legal and Humanities Scholarship](#legal-and-humanities-scholarship): `DO
 `ISSN`, `arXiv`, `report` (technical/institutional report number).
 
 **Web pointer.** `<ptr type="web" target="...">` holds a URL as text content, excluding
-prefixes like "URL:" and trailing periods.
+prefixes like "URL:" and trailing periods. An identifier that occurs only inside the URL
+may be tagged in place with a nested `<idno>` (see
+[Data embedded in a title or URL](#data-embedded-in-a-title-or-url)).
+
+If the URL itself contains a DOI (e.g. `https://doi.org/10.1162/coli_a_00345` or
+`https://dx.doi.org/...`) and the reference does not also give the DOI separately as
+its own `<idno type="DOI">`, mark up the DOI portion of the URL text with an embedded
+`<idno type="DOI">`, nested inside the `<ptr type="web">`:
+
+```xml
+<ptr type="web" target="https://doi.org/10.1162/coli_a_00345">https://doi.org/<idno type="DOI">10.1162/coli_a_00345</idno></ptr>
+```
+
+If a separate, standalone `<idno type="DOI">` is already present elsewhere in the
+reference, leave the URL's `<ptr type="web">` as plain text instead — do not annotate
+the same DOI twice.
 
 **Miscellaneous note.** `<note type="report">` marks any note not covered by another
 tag — typically the type of report or thesis (e.g. "Ph.D. thesis", "Technical Report").
@@ -808,10 +838,13 @@ marginal number, say), there is simply no `<biblScope unit="page">` — only
 ```xml
 <idno type="docket">C-160/15</idno>
 <idno type="ECLI">ECLI:EU:C:2016:644</idno>
-<idno type="CELEX">…</idno>
+<idno type="CELEX">32019L0790</idno>
+<idno type="actNumber">2019/790</idno>
 ```
 
-These are the legal-specific values of `<idno type="...">`, alongside the general ones
+`actNumber` is a legislative act's own official year/number designation (e.g. the
+"2019/790" in "Directive (EU) 2019/790"). It is not a volume or issue: no periodical is
+involved. These are the legal-specific values of `<idno type="...">`, alongside the general ones
 listed under [Basic bibliographic elements](#basic-bibliographic-elements).
 
 #### Case short-name and statute short-title
@@ -903,6 +936,46 @@ that phrase or title, without `<citedRange>` or a legislation `<title>`:
 Here neither `§ 60 d UrhG` nor `DSM-Directive` is annotated: the cited source is the
 report, not the statute or the directive.
 
+#### Data embedded in a title or URL
+
+Court-decision citations usually present the authority, date and docket number as
+separable fields, which are tagged as flat siblings inside the `<bibl>` (see
+[The issuing authority](#the-issuing-authority-authority)). Formal titles of
+legislative acts often do not: the act's number, the issuing body and the enactment date
+are grammatically part of the title string itself. In that case, keep the title as one
+continuous `<title>` span in the original word order, and tag the embedded data points
+in place inside it. `<title>` accepts `<idno>`, `<authority>`, `<date>` and `<ref>` as
+children for this purpose.
+
+> Directive (EU) 2019/790 of the European Parliament and of the Council of 17 April 2019 on copyright and related rights in the Digital Single Market and amending Directives 96/9/EC and 2001/29/EC, DSM Directive, https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32019L0790
+
+```xml
+<bibl type="legislation"><title level="m" type="legislation" key="DSM Directive">Directive (EU)
+  <idno type="actNumber">2019/790</idno> of <authority type="legislature">the European
+  Parliament and of the Council</authority> of <date type="enacted" when="2019-04-17">17 April
+  2019</date> on copyright and related rights in the Digital Single Market and amending
+  Directives <ref type="work">96/9/EC</ref> and <ref type="work">2001/29/EC</ref></title>,
+  <title level="m" type="legislation" subtype="short" key="DSM Directive">DSM Directive</title>,
+  <ptr type="web">https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:<idno
+  type="CELEX">32019L0790</idno></ptr>.</bibl>
+```
+
+- **Short title.** `subtype="short"` marks an abbreviated or alternate form of a title
+  that is already tagged in full in the same `<bibl>`, typically one that later footnotes
+  use on its own ("DSM Directive"). It combines with any `@level`/`@type` preset. Give
+  both forms the same `@key` so they can be linked when the citation is resolved.
+- **Identifier inside a URL.** When an identifier appears only as part of a URL (here
+  the CELEX number in the query string), tag it with a nested `<idno>` inside the
+  `<ptr>`. Do not repeat it outside the `<ptr>`: annotation only adds tags, it never
+  adds or changes text.
+- **Other works mentioned in a title.** `<ref type="work">` marks a passing mention of
+  another work that does not get a citation of its own (here the two amended
+  directives). Tagging these is optional.
+
+Nesting does not replace the flat pattern: where the source presents authority, date and
+identifier as separate fields, keep tagging them as siblings of `<title>`. Only nest
+when the source text itself nests them.
+
 #### Intra-footnote references
 
 Legal and humanities footnotes constantly avoid repeating a citation just given, using
@@ -915,6 +988,7 @@ devices such as *id.*, *op. cit.*, *ibid.*, *a.a.O.*, *ders.*, *supra*, *infra*,
 | `subsequentWork` | a work cited later | *infra*, *below* |
 | `precedingAuthor` | the author just named, work unspecified | `ders.`, `idem` |
 | `footnote` | an explicit cross-reference to another footnote, carrying `@n` | `n. 7`, `N. 22`, "oben N. 22" |
+| `work` | a passing mention of another work that is not cited in its own `<bibl>` | "amending Directives 96/9/EC" (see [Data embedded in a title or URL](#data-embedded-in-a-title-or-url)) |
 
 ```xml
 <bibl><author>Vogel</author>, <ref type="precedingWork">id.</ref>,
