@@ -21,6 +21,7 @@
         <choice>
           <ref name="encodingDesc"/>
           <ref name="fileDesc"/>
+          <ref name="profileDesc"/>
           <ref name="revisionDesc"/>
         </choice>
       </zeroOrMore>
@@ -208,6 +209,41 @@
 
   <define name="desc">
     <element name="desc">
+      <text/>
+    </element>
+  </define>
+
+  <define name="profileDesc">
+    <element name="profileDesc">
+      <a:documentation>(text-profile description) provides a detailed description of non-bibliographic aspects of a text, specifically the languages and sublanguages used, the situation in which it was produced, the participants and their setting. [2.4. The Profile Description 2.1.1. The TEI Header and Its Components]</a:documentation>
+      <zeroOrMore>
+        <ref name="langUsage"/>
+      </zeroOrMore>
+    </element>
+  </define>
+
+  <define name="langUsage">
+    <element name="langUsage">
+      <a:documentation>(language usage) describes the languages, sublanguages, registers, dialects, etc. represented within a text. [2.4.2. Language Usage 2.4. The Profile Description 15.3.2. Declarable Elements]</a:documentation>
+      <oneOrMore>
+        <ref name="language"/>
+      </oneOrMore>
+    </element>
+  </define>
+
+  <define name="language">
+    <element name="language">
+      <a:documentation>(language) characterizes a single language or sublanguage used within a text. [2.4.2. Language Usage]</a:documentation>
+      <attribute name="ident">
+        <a:documentation>(identifier) Supplies a language code constructed as defined in BCP 47 which is used to identify the language documented by this element, and which may be referenced by the global xml:lang attribute.</a:documentation>
+        <data type="language" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"/>
+      </attribute>
+      <optional>
+        <attribute name="usage">
+          <a:documentation>specifies the approximate percentage of the text which uses this language.</a:documentation>
+          <data type="nonNegativeInteger" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"/>
+        </attribute>
+      </optional>
       <text/>
     </element>
   </define>
