@@ -837,18 +837,24 @@ The `<bibl>` gets no `type="legislation"`, and the heading is not split into
 `<citedRange unit="section">` and a statute title.
 
 German legal scholarship cites commentaries in a standardized short form in footnotes
-(the full citation is reserved for the bibliography). The footnote names the commentator
-of the individual entry (*Bearbeiter*), never the general editors of the whole work;
-editors' names only appear as part of the commentary's short title (e.g. `Dreier/Schulze`).
-The commentator is optional and is often omitted. Two forms are common, where "Rn."
-(*Randnummer*) is the marginal number:
+(the full citation is reserved for the bibliography). Two names can appear:
+
+- **The commentary's short title.** Many commentaries are named after their founding
+  editors (`Dreier/Schulze`, `Grüneberg`). These names are part of the title, not
+  authors, and are annotated with it as `<title level="m">`.
+- **The commentator** (*Bearbeiter*) who wrote the cited entry. This is the only person
+  annotated as `<author>`. The commentator is optional and often omitted.
+
+Two forms are common, where "Rn." (*Randnummer*) is the marginal number:
 
 | Form | Example |
 | --- | --- |
 | `Author, in: Short title, § X Rn. Y` | `Westermann, in: MünchKomm-BGB, § 985 Rn. 12` |
 | `Short title/Author, § X Rn. Y` | `MünchKomm-BGB/Westermann, § 985 Rn. 12` |
 
-In both forms, the commentator is `<author>` and the short title is `<title level="m">`;
+In the slash form, the commentator is the name after the *last* slash; everything before
+it is the short title (`Dreier/Schulze/Dreier` is the commentary *Dreier/Schulze*, entry
+by Dreier). In both forms, the commentator is `<author>` and the short title is `<title level="m">`;
 the slash, "in:" and commas stay outside the tags. When the statute is already part of
 the commentary's title (`MünchKomm-BGB`), the entry heading is just `§ 985`, still
 annotated as `<title level="a">`.
