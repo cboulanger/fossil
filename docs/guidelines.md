@@ -836,19 +836,49 @@ commentary*, not the statute itself. Annotate it as an analytic title
 The `<bibl>` gets no `type="legislation"`, and the heading is not split into
 `<citedRange unit="section">` and a statute title.
 
-Commentary citations often name the work and the commentator in one string
-(`BeckOK UrhR/Grübler`, `Dreier/Schulze/Dreier`). Keep that string as it stands: as
-`<title level="m">` when it begins with the work's title, as `<author>` when it consists
-of the editors' and commentator's names.
+German legal scholarship cites commentaries in a standardized short form in footnotes
+(the full citation is reserved for the bibliography). The footnote names the commentator
+of the individual entry (*Bearbeiter*), never the general editors of the whole work;
+editors' names only appear as part of the commentary's short title (e.g. `Dreier/Schulze`).
+The commentator is optional and is often omitted. Two forms are common, where "Rn."
+(*Randnummer*) is the marginal number:
+
+| Form | Example |
+| --- | --- |
+| `Author, in: Short title, § X Rn. Y` | `Westermann, in: MünchKomm-BGB, § 985 Rn. 12` |
+| `Short title/Author, § X Rn. Y` | `MünchKomm-BGB/Westermann, § 985 Rn. 12` |
+
+In both forms, the commentator is `<author>` and the short title is `<title level="m">`;
+the slash, "in:" and commas stay outside the tags. When the statute is already part of
+the commentary's title (`MünchKomm-BGB`), the entry heading is just `§ 985`, still
+annotated as `<title level="a">`.
 
 ```xml
-<bibl><title level="m">BeckOK UrhR/Grübler</title>, <edition n="42">42. Ed.</edition>
-  <date>1.5.2024</date>, <title level="a">UrhG § 60c</title>
-  <citedRange unit="margin">Rn. 5</citedRange>;</bibl>
+<bibl><author>Westermann</author>, in: <title level="m">MünchKomm-BGB</title>,
+  <title level="a">§ 985</title> <citedRange unit="margin">Rn. 12</citedRange></bibl>
 
-<bibl><author>Dreier/Schulze/Dreier</author>, <edition n="7">7. Aufl.</edition>
-  <date type="publication" when="2022">2022</date>, <title level="a">UrhG § 60c</title>
-  <citedRange unit="margin">Rn. 1</citedRange>.</bibl>
+<bibl><title level="m">MünchKomm-BGB</title>/<author>Westermann</author>,
+  <title level="a">§ 985</title> <citedRange unit="margin">Rn. 12</citedRange></bibl>
+
+<bibl><author>Spindler</author>, in: <title level="m">BeckOK-BGB</title>,
+  <title level="a">§ 823</title> <citedRange unit="margin">Rn. 45</citedRange></bibl>
+
+<bibl><title level="m">BeckOK UrhR</title>/<author>Grübler</author>,
+  <edition n="42">42. Ed.</edition> <date>1.5.2024</date>,
+  <title level="a">UrhG § 60c</title> <citedRange unit="margin">Rn. 5</citedRange>;</bibl>
+
+<bibl><title level="m">Dreier/Schulze</title>/<author>Dreier</author>,
+  <edition n="7">7. Aufl.</edition> <date type="publication" when="2022">2022</date>,
+  <title level="a">UrhG § 60c</title> <citedRange unit="margin">Rn. 1</citedRange>.</bibl>
+```
+
+Single-volume commentaries named after their editor (e.g. *Grüneberg*, formerly
+*Palandt*) are often cited without a commentator, e.g. `Grüneberg, BGB, § 280 Rn. 8`.
+Here the name is part of the commentary's title, not an `<author>`:
+
+```xml
+<bibl><title level="m">Grüneberg, BGB</title>, <title level="a">§ 280</title>
+  <citedRange unit="margin">Rn. 8</citedRange></bibl>
 ```
 
 #### Mentions of legal texts
