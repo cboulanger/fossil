@@ -135,6 +135,8 @@ There are three exceptions to this main rule:
    >     <date>2017</date>
    > ```
 
+4. Never place a non-whitespace character outside of the direct child elements of `<text>`. All text content must be inside of one of them. 
+
 ## Document segmentation model
 
 > [!NOTE]
