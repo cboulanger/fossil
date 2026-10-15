@@ -826,6 +826,47 @@ listed under [Basic bibliographic elements](#basic-bibliographic-elements). Tagg
 case short-name explicitly, rather than leaving it as trailing free text, is what stops
 the model from treating `– GS Media/Sanoma` as the start of a new reference.
 
+#### German legal commentaries (Kommentare)
+
+A commentary (e.g. *BeckOK UrhR*, *Dreier/Schulze*) is organized by the provisions of the
+statute it explains. A heading such as `UrhG § 60c` therefore names an *entry within the
+commentary*, not the statute itself. Annotate it as an analytic title
+(`<title level="a">`), and the commentary as the monograph-level title
+(`<title level="m">`). The marginal number into the entry is `<citedRange unit="margin">`.
+The `<bibl>` gets no `type="legislation"`, and the heading is not split into
+`<citedRange unit="section">` and a statute title.
+
+Commentary citations often name the work and the commentator in one string
+(`BeckOK UrhR/Grübler`, `Dreier/Schulze/Dreier`). Keep that string as it stands: as
+`<title level="m">` when it begins with the work's title, as `<author>` when it consists
+of the editors' and commentator's names.
+
+```xml
+<bibl><title level="m">BeckOK UrhR/Grübler</title>, <edition n="42">42. Ed.</edition>
+  <date>1.5.2024</date>, <title level="a">UrhG § 60c</title>
+  <citedRange unit="margin">Rn. 5</citedRange>;</bibl>
+
+<bibl><author>Dreier/Schulze/Dreier</author>, <edition n="7">7. Aufl.</edition>
+  <date type="publication" when="2022">2022</date>, <title level="a">UrhG § 60c</title>
+  <citedRange unit="margin">Rn. 1</citedRange>.</bibl>
+```
+
+#### Mentions of legal texts
+
+Annotate a statute or other legal text only when it is itself the source cited for a
+statement, i.e. when the `<bibl>` refers to it. A legal text that is merely mentioned —
+inside a citation-signal phrase or inside the title of a cited work — is left as part of
+that phrase or title, without `<citedRange>` or a legislation `<title>`:
+
+```xml
+<bibl><seg type="citationContext">For a more detailed analysis of § 60 d UrhG,</seg>
+  <author>G. Iacino</author>, <author>P. Kamocki</author>, <author>P. Leinen</author>,
+  <title level="m">Assessment of the Impact of the DSM-Directive on Text+</title>.</bibl>
+```
+
+Here neither `§ 60 d UrhG` nor `DSM-Directive` is annotated: the cited source is the
+report, not the statute or the directive.
+
 #### Intra-footnote references
 
 Legal and humanities footnotes constantly avoid repeating a citation just given, using
