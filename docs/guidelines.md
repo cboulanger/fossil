@@ -658,13 +658,17 @@ An optional `@key` holds a short resolvable key for a named work (e.g. an abbrev
 so it can later be linked to an external database.
 
 **Dates.** `<date type="publication" when="...">` marks the publication date; `@when`
-holds [the machine-readable ISO form](https://web.uvic.ca/lancenrd/martin/guidelines/ref-att.datable.w3c.html) 
-when it can be determined, the text content the form as it appears in the source. 
-`@when` ususally does not need to be annotated since it will be added in a postprocessing step. 
-It should be added if the text content is ambiguous.
+holds [the machine-readable ISO form](https://web.uvic.ca/lancenrd/martin/guidelines/ref-att.datable.w3c.html)
+and the text content the date as it appears in the source. The same single-value rule
+as for `<biblScope>`/`<citedRange>` above applies here: a bare year on its own (`2019`)
+is already that ISO form, so no `@when` is needed. As soon as the text is a fuller or
+non-ISO date — a day-month-year date, a date with a month name, an abbreviated form
+like `8.9.2016` — the content is no longer machine-readable on its own, so set `@when`
+to the converted ISO value. Only omit `@when` on such a date when the source genuinely
+does not pin down a resolvable date, e.g. "n.d.".
 
 **Extent.** `<biblScope unit="...">` carries the cited work's own extent — its volume,
-issue, or overall page range — with optional `@from`/`@to`:
+issue, or overall page range:
 
 | `@unit` | Matches |
 | --- | --- |
@@ -672,9 +676,49 @@ issue, or overall page range — with optional `@from`/`@to`:
 | `volume` | Volume number |
 | `issue` | Issue / number |
 
+**"p."/"pp." (in any language) stay outside the tag.** This follows
+[Grobid's own convention](https://grobid.readthedocs.io/en/latest/training/Bibliographical-references/index.html):
+a page abbreviation — `p.`, `pp.`, `S.`, or the equivalent in any other language — maps
+onto `@unit="page"` unambiguously, so it adds nothing `@unit` doesn't already say and is
+left as plain text before the tag:
 
-As with `@when`, `@from` and `@to` can be left out when annotating if the pages cannot be 
-reliably inferred from the text context itself, such as in the case "pp. 23-34".
+```xml
+p. <biblScope unit="page">79</biblScope>
+pp. <biblScope unit="page" from="517" to="518">517-518</biblScope>
+```
+
+Other pinpoint abbreviations are different: `Rn.`, `§`, `Abs.`, `lit.` and the like each
+require interpreting *which* `@unit` they map to (margin, section, subSection, letter —
+there is no single unambiguous target the way there is for a page), so that
+interpretive step is itself worth preserving. These stay inside the tag, normalized
+through `@n` or `@from`/`@to` as covered under
+[Pinpoint citations](#pinpoint-citations-citedrange) below.
+
+**Single value, `@n`, or range.** A single value whose text content is already a
+bare number needs no extra attribute at all — the content itself is the value:
+
+```xml
+<biblScope unit="volume">3</biblScope>
+```
+
+As soon as the text content is non-numeric or mixed with other text — a Roman
+numeral, or a value with a unit abbreviation still attached — it is no longer
+machine-readable on its own, so add `@n` to hold the normalized value:
+
+```xml
+<biblScope unit="volume" n="2">II</biblScope>
+```
+
+A genuine range — two distinct, named endpoints — gets `@from`/`@to`:
+
+```xml
+<biblScope unit="volume" from="3" to="5">3–5</biblScope>
+```
+
+When only the start of a range is given in the text and its end is not (an article
+cited by its first page alone, say), set `@from` alone and omit `@to` — do not repeat
+a single value in both `@from` and `@to`, since that wrongly implies a span the text
+never named.
 
 **Pinpoint extent.** When the citing text names a more specific location than
 `<biblScope>`'s own extent — the common "first page, at pinpoint page" pattern, e.g.
@@ -742,13 +786,13 @@ A non-legal example combining several of these:
   <title level="j">Journal of Computational Linguistics</title>
   <biblScope unit="volume">45</biblScope>(<biblScope unit="issue">2</biblScope>),
   <biblScope unit="page" from="123" to="145">123–145</biblScope>
-  (<date type="publication" when="2019">2019</date>).
+  (<date type="publication">2019</date>).
   <idno type="DOI">10.1162/coli_a_00345</idno>
 </bibl>
 
 <bibl><author>M. Müller</author>, <title level="m">Diffusion Models for Generative Art</title>
   (Ph.D. thesis, <orgName type="institution">ETH Zürich</orgName>,
-  <date type="publication" when="2022">2022</date>).
+  <date type="publication">2022</date>).
   <note type="report">Ph.D. thesis</note>
 </bibl>
 ```
@@ -824,19 +868,40 @@ marginal number, say), there is simply no `<biblScope unit="page">` — only
 
 ```xml
 <bibl type="legislation">
-  <citedRange unit="section">§ 19a</citedRange>
-  <citedRange unit="subSection">Abs. 2</citedRange>
+  <citedRange unit="section" n="19a">§ 19a</citedRange>
+  <citedRange unit="subSection" n="2">Abs. 2</citedRange>
   <title level="m" type="legislation" key="UrhG">UrhG</title>
 </bibl>
 ```
 
-**Always set `@from`/`@to`.** Unless the pinpoint's exact bounds genuinely cannot be
-inferred from the text, give `<citedRange>` both `@from` and `@to` — including for a
-single pinpoint that is not a range, where both attributes simply repeat the same value:
+**Single value, `@n`, or range** — the same rule as for `<biblScope>` above,
+including keeping an attached unit abbreviation (`Rn.`, `§`, `Abs.`, `lit.`) inside
+the tag rather than stripping it out. A single pinpoint whose text content is already
+a bare number needs no extra attribute; once the content is non-numeric or mixed with
+other text because such an abbreviation is attached, add `@n` to hold the normalized
+value so it stays machine-readable. Reserve `@from`/`@to` for an actual range — never
+repeat a single value in both to express one point, which wrongly implies a span the
+text never named:
 
 ```xml
-<citedRange unit="page" from="240" to="240">240</citedRange>
+<citedRange unit="page">240</citedRange>
+<citedRange unit="margin" n="12">Rn. 12</citedRange>
 ```
+
+**Telling an item's own extent apart from a pinpoint.** A single page number or a
+small page range (`p. 5`, `pp. 23–27`) has exactly the same shape whether it names the
+*analytic item's own extent* — a short chapter, a commentary or dictionary entry — or
+a *pinpoint* into a longer work already cited (or about to be cited) by a larger
+extent; the two cannot be told apart by form alone. Decide by what the number actually
+bounds: if it is the full extent of the analytic item (`<title level="a">`) inside its
+monographic container (`<title level="m">`), annotate it as `<biblScope>`; if it
+locates a passage inside a work whose own extent is given separately, annotate it as
+`<citedRange>`. An open-ended continuation marker — `f.`/`ff.` or `et seq.`/`et seqq.`,
+covered next — is a reliable sign of the second case: a work's own extent has a
+definite end, so no one describes it as "p. 233 ff."; that phrasing only makes sense
+when pointing into a passage whose end the citing author hasn't bothered to name.
+Annotate any `f.`/`ff.`/`et seq.`/`et seqq.` pinpoint as `<citedRange>`, never as
+`<biblScope>`.
 
 **Open-ended continuation pinpoints (`f.`, `ff.`, `et seq.`, `et seqq.`).** The citing
 text sometimes marks a pinpoint as continuing onto subsequent pages or sections instead
@@ -923,21 +988,21 @@ annotated as `<title level="a">`.
 
 ```xml
 <bibl><author>Westermann</author>, in: <title level="m">MünchKomm-BGB</title>,
-  <title level="a">§ 985</title> <citedRange unit="margin">Rn. 12</citedRange></bibl>
+  <title level="a">§ 985</title> <citedRange unit="margin" n="12">Rn. 12</citedRange></bibl>
 
 <bibl><title level="m">MünchKomm-BGB</title>/<author>Westermann</author>,
-  <title level="a">§ 985</title> <citedRange unit="margin">Rn. 12</citedRange></bibl>
+  <title level="a">§ 985</title> <citedRange unit="margin" n="12">Rn. 12</citedRange></bibl>
 
 <bibl><author>Spindler</author>, in: <title level="m">BeckOK-BGB</title>,
-  <title level="a">§ 823</title> <citedRange unit="margin">Rn. 45</citedRange></bibl>
+  <title level="a">§ 823</title> <citedRange unit="margin" n="45">Rn. 45</citedRange></bibl>
 
 <bibl><title level="m">BeckOK UrhR</title>/<author>Grübler</author>,
-  <edition n="42">42. Ed.</edition> <date>1.5.2024</date>,
-  <title level="a">UrhG § 60c</title> <citedRange unit="margin">Rn. 5</citedRange>;</bibl>
+  <edition n="42">42. Ed.</edition> <date type="publication" when="2024-05-01">1.5.2024</date>,
+  <title level="a">UrhG § 60c</title> <citedRange unit="margin" n="5">Rn. 5</citedRange>;</bibl>
 
 <bibl><title level="m">Dreier/Schulze</title>/<author>Dreier</author>,
-  <edition n="7">7. Aufl.</edition> <date type="publication" when="2022">2022</date>,
-  <title level="a">UrhG § 60c</title> <citedRange unit="margin">Rn. 1</citedRange>.</bibl>
+  <edition n="7">7. Aufl.</edition> <date type="publication">2022</date>,
+  <title level="a">UrhG § 60c</title> <citedRange unit="margin" n="1">Rn. 1</citedRange>.</bibl>
 ```
 
 Single-volume commentaries named after their editor (e.g. *Grüneberg*, formerly
@@ -946,7 +1011,7 @@ Here the name is part of the commentary's title, not an `<author>`:
 
 ```xml
 <bibl><title level="m">Grüneberg, BGB</title>, <title level="a">§ 280</title>
-  <citedRange unit="margin">Rn. 8</citedRange></bibl>
+  <citedRange unit="margin" n="8">Rn. 8</citedRange></bibl>
 ```
 
 #### Mentions of legal texts
@@ -1021,14 +1086,14 @@ devices such as *id.*, *op. cit.*, *ibid.*, *a.a.O.*, *ders.*, *supra*, *infra*,
 
 ```xml
 <bibl><author>Vogel</author>, <ref type="precedingWork">id.</ref>,
-  <citedRange unit="page" from="79" to="79">p. 79</citedRange></bibl>
+  p. <citedRange unit="page">79</citedRange></bibl>
 
 <bibl><author>Vogel</author>, <ref type="precedingWork">op. cit.</ref>,
   <ref type="footnote" n="7">n. 7</ref>,
-  <citedRange unit="page" from="80" to="81">pp. 80–1.</citedRange></bibl>
+  pp. <citedRange unit="page" from="80" to="81">80–1</citedRange>.</bibl>
 
 <bibl><ref type="precedingAuthor">Ders.</ref>, <ref type="precedingWork">a.a.O.</ref>,
-  <citedRange unit="page" from="123" to="123">S. 123</citedRange>.</bibl>
+  S. <citedRange unit="page">123</citedRange>.</bibl>
 ```
 
 When two of these devices sit next to each other but are lexically distinct — e.g.
@@ -1038,7 +1103,7 @@ them into one:
 ```xml
 <author>Kaiser</author>
 (<ref type="precedingWork">oben</ref> <ref type="footnote" n="22">N. 22</ref>)
-<biblScope unit="page" from="89" to="89">89</biblScope>
+<biblScope unit="page">89</biblScope>
 ```
 
 The same pattern applies to a *forward*-pointing reference, combining `subsequentWork`
@@ -1062,7 +1127,7 @@ whole introductory phrase (not just a single trigger word) with
 ```xml
 <seg type="citationContext">For further analysis of the marriage contract, see</seg>
 <author>K. O'Donovan</author>, <title level="m">Family Matters</title>
-(<date type="publication" when="1993">1993</date>), especially
+(<date type="publication">1993</date>), especially
 <citedRange unit="page" from="43" to="59">43–59</citedRange>.
 ```
 
@@ -1115,11 +1180,11 @@ citations, each with its own signal phrase or `supra`-style back-reference:
 <bibl><seg type="citationContext">cf.</seg> <author>Carli N. Conklin</author>,
   <title level="a">The Origins of the Pursuit of Happiness</title>,
   <title level="j">7 Wash. U. Juris. Rev.</title>
-  <biblScope unit="page" from="195" to="195">195</biblScope>, <citedRange unit="page" from="200" to="200">200</citedRange> (<date type="publication" when="2015">2015</date>)
+  <biblScope unit="page" from="195">195</biblScope>, <citedRange unit="page">200</citedRange> (<date type="publication">2015</date>)
   (selecting for use the first edition, as does the present article);
 </bibl>
 <bibl><author>Alan Watson</author>, <title level="a">The Structure of Blackstone's Commentaries</title>,
-  <title level="j">97 Yale L.J.</title> <biblScope unit="page" from="795" to="795">795</biblScope>, <citedRange unit="page" from="801" to="801">801</citedRange> (<date type="publication" when="1988">1988</date>) (same).
+  <title level="j">97 Yale L.J.</title> <biblScope unit="page" from="795">795</biblScope>, <citedRange unit="page">801</citedRange> (<date type="publication">1988</date>) (same).
 </bibl>
 ```
 
@@ -1147,20 +1212,21 @@ This is the **German legal citation** example:
 
 ```xml
 <bibl><label>2</label> <seg type="citationContext">Dazu etwa:</seg> <author>Hofmann</author>,
-  <title level="j">ZGE</title> <date type="publication" when="2016">2016</date>,
-  <biblScope unit="page">482</biblScope>, <citedRange unit="page">498</citedRange>;
+  <title level="j">ZGE</title> <date type="publication">2016</date>,
+  <biblScope unit="page" from="482">482</biblScope>, <citedRange unit="page">498</citedRange>;
 </bibl>
-<bibl><author>Becker</author>, <title level="j">ZGE</title> <date type="publication" when="2016">2016</date>,
-  <biblScope unit="page">239</biblScope>, <citedRange unit="page">273</citedRange>;
+<bibl><author>Becker</author>, <title level="j">ZGE</title> <date type="publication">2016</date>,
+  <biblScope unit="page" from="239">239</biblScope>, <citedRange unit="page">273</citedRange>;
 </bibl>
-<bibl><author>Raue</author>, <title level="j">ZGE</title> <date type="publication" when="2014">2014</date>,
-  <biblScope unit="page">387</biblScope>, <citedRange unit="page">389</citedRange>.
+<bibl><author>Raue</author>, <title level="j">ZGE</title> <date type="publication">2014</date>,
+  <biblScope unit="page" from="387">387</biblScope>, <citedRange unit="page">389</citedRange>.
 </bibl>
 ```
 
 Each citation follows the German convention of *first page, pinpoint page* ("482,
-498"), so the first page becomes `<biblScope unit="page">` (the article's own extent)
-and the pinpoint becomes `<citedRange unit="page">` — the same
+498"), so the first page becomes `<biblScope unit="page">` (the article's own extent —
+only `@from` is set, since the article's actual last page is never given) and the
+pinpoint becomes `<citedRange unit="page">` — the same
 [page/pinpoint distinction](#pinpoint-citations-citedrange) as `233 (240)` in the
 real-world example below.
 
@@ -1171,7 +1237,7 @@ This is **introductory comment, example 1** (Kuschel):
 ```xml
 <bibl><label>3</label> <seg type="citationContext">Zur Frage, ob der Erwerb eines (digitalen) Werkexemplars mit dem Erwerb eines dinglichen Genussrechts verbunden ist, vgl.:</seg>
   <author>Kuschel</author>, <title level="m">Der Erwerb digitaler Werkexemplare zur privaten Nutzung</title>,
-  <date type="publication" when="2019">2019</date>.
+  <date type="publication">2019</date>.
 </bibl>
 ```
 
@@ -1186,19 +1252,19 @@ carries its own, separate signal phrase rather than sharing the first one:
 ```xml
 <bibl><label>15</label> <seg type="citationContext">Arguing that national corporate due diligence laws potentially breach the principle of consent in international law and the sovereignty of host States, and perpetuate power imbalances of colonial derivation, see e.g.:</seg>
   <author>C. Omari Lichuma</author>, <title level="a">(Laws) Made in the 'First World'</title>,
-  <ref type="precedingWork">cit.</ref>, <biblScope unit="page" from="517" to="518">pp. 517-518</biblScope>;
+  <ref type="precedingWork">cit.</ref>, pp. <biblScope unit="page" from="517" to="518">517-518</biblScope>;
 </bibl>
 <bibl>
   <author>F. Dehbi</author>, <author>O. Martin-Ortega</author>,
   <title level="a">An integrated approach to corporate due diligence from a human rights, environmental, and TWAIL perspective</title>,
-  <title level="j">Regulation &amp; Governance</title>, <date type="publication" when="2023">2023</date>,
-  <biblScope unit="issue">17</biblScope>, <biblScope unit="page" from="927" to="943">pp. 927-943</biblScope>,
-  in particular <citedRange unit="page" from="932" to="935">pp. 932-935</citedRange>.
+  <title level="j">Regulation &amp; Governance</title>, <date type="publication">2023</date>,
+  <biblScope unit="issue">17</biblScope>, pp. <biblScope unit="page" from="927" to="943">927-943</biblScope>,
+  in particular pp. <citedRange unit="page" from="932" to="935">932-935</citedRange>.
 </bibl>
 <bibl>
   <seg type="citationContext">In contrast, affirming that such national legislations are to be regarded as instruments facilitating home States' compliance with their international obligations, rather than as breaches of the host States' sovereignty, see:</seg>
   <author>A. Bonfanti</author>, <title level="m">Imprese multinazionali, diritti umani e ambiente. Profili di diritto internazionale pubblico e privato</title>,
-  <pubPlace>Milano</pubPlace>, <date type="publication" when="2012">2012</date>, <biblScope unit="page">136</biblScope>.
+  <pubPlace>Milano</pubPlace>, <date type="publication">2012</date>, p. <biblScope unit="page">136</biblScope>.
 </bibl>
 ```
 
@@ -1217,7 +1283,7 @@ text:
   <authority type="court">Inter-American Court of Human Rights</authority>,
   <date type="decision" when="2020-02-16">judgment of 16 February 2020</date>,
   <title level="a" type="caseName">Indigenous Communities of the Lhaka Honhat (Our Land) Association v. Argentina</title>,
-  <citedRange unit="number">par. 254</citedRange>,
+  <citedRange unit="number" n="254">par. 254</citedRange>,
   <seg type="citationContext">quoting the amicus curiae intervention of the former UN Special Rapporteur on the Right to Food, De Schutter:</seg>
   <quote>«Many indigenous peoples understand the right to adequate food as a collective right. They often see subsistence activities such as hunting, fishing and gathering as essential not only to their right to food, but to nurturing their cultures, languages, social life and identity».</quote>
   The cultural value of food is recognized – with respect to indigenous peoples in particular – also under
@@ -1327,26 +1393,26 @@ references:
 ```xml
 <listBibl>
   <bibl><label>8</label> <author>Günther Kaiser</author>, <title level="m">Kriminologie: Ein Lehrbuch</title>
-    <edition n="3">3d ed.</edition> (<date type="publication" when="1996">1996</date>).
+    <edition n="3">3d ed.</edition> (<date type="publication">1996</date>).
   </bibl>
 
   <bibl><label>19</label> <seg type="citationContext">See, e.g.,</seg>
     <author>Neil J. Smelser</author>, <title level="m">Theory of Collective Behavior</title>
     <biblScope unit="page" from="175" to="176">175-76</biblScope>
-    (<date type="publication" when="1962">1962</date>).
+    (<date type="publication">1962</date>).
   </bibl>
   <bibl><seg type="citationContext">On criminology, see</seg>
     <author>Kaiser</author>, <ref type="precedingWork">supra</ref> <ref type="footnote" n="8">note 8</ref>,
-    <biblScope unit="page" from="89" to="89">89</biblScope>, as well as
+    <biblScope unit="page">89</biblScope>, as well as
   </bibl>
   <bibl>
     <author>Blazicek</author> &amp; <author>Janeksela</author>,
     <title level="a">Some Comments on Comparative Methodologies in Criminal Justice</title>,
     <biblScope unit="volume">6</biblScope>
     <title level="j">Int'l J. Comp. &amp; Applied Crim. Just.</title>
-    <biblScope unit="page" from="233" to="233">233</biblScope>,
+    <biblScope unit="page" from="233">233</biblScope>,
     <citedRange unit="page">240</citedRange>
-    (<date type="publication" when="1978">1978</date>).
+    (<date type="publication">1978</date>).
   </bibl>
   <bibl>
     <seg type="citationContext">The uncritical transfer of such concepts to countries of the Third World has proven especially dangerous, as discussed further</seg>
@@ -1357,14 +1423,14 @@ references:
     <title level="a">Comparative Law and Social Change: On the Origins, Style, Decline and Revival of the Law and Development Movement</title>,
     <biblScope unit="volume">25</biblScope>
     <title level="j">Am. J. Comp. L.</title>
-    <biblScope unit="page">457</biblScope>
+    <biblScope unit="page" from="457">457</biblScope>
     <citedRange unit="page">479</citedRange>
-    (<date type="publication" when="1977">1977</date>).
+    (<date type="publication">1977</date>).
   </bibl>
 
   <bibl><label>24</label> <author>Elena Vargas</author>, <title level="m">Law and Development Reconsidered</title>
     <biblScope unit="page" from="112" to="114">112-14</biblScope>
-    (<date type="publication" when="2005">2005</date>)
+    (<date type="publication">2005</date>)
     (arguing that the movement's failures reflected its parochial assumptions rather than any flaw in its underlying goals).
   </bibl>
 </listBibl>
