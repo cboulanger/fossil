@@ -1150,8 +1150,24 @@ whole introductory phrase (not just a single trigger word) with
 <citedRange unit="page" from="43" to="59">43–59</citedRange>.
 ```
 
-`<seg type="citationContext">` marks only the signal phrase itself, not the citation
-that follows it. When several citations share one signal phrase, keep the phrase only in
+The `<seg>` must contain the **complete** text leading up to the signal word ("see",
+"cf.", "vgl." …), not only the signal word or the words it starts. Start the `<seg>` at
+the beginning of the introductory text and end it after the signal. This text can be
+longer than one sentence.
+
+Correct:
+
+```xml
+<seg type="citationContext">In the Polish literature -cf.</seg> <editor>Z. Kmieciak</editor>...
+```
+
+Incorrect (the leading text is left outside the `<seg>`):
+
+```xml
+In the Polish literature <seg type="citationContext">-cf.</seg> <editor>Z. Kmieciak</editor>...
+```
+
+`<seg type="citationContext">` does not include the citation that follows the signal. When several citations share one signal phrase, keep the phrase only in
 the first (or nearest) `<bibl>` it introduces — see the
 [pipeline example](#worked-example-the-full-annotation-pipeline) below and the
 referenceSegmenter's ["introductory comment" examples](#reference-segmentation-model)
