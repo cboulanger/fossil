@@ -1153,7 +1153,8 @@ whole introductory phrase (not just a single trigger word) with
 The `<seg>` must contain the **complete** text leading up to the signal word ("see",
 "cf.", "vgl." …), not only the signal word or the words it starts. Start the `<seg>` at
 the beginning of the introductory text and end it after the signal. This text can be
-longer than one sentence.
+longer than one sentence. The `<seg>` holds plain text only, so titles or names
+mentioned in it are not tagged.
 
 Correct:
 
@@ -1204,11 +1205,11 @@ citations, each with its own signal phrase or `supra`-style back-reference:
   <title level="m">Commentaries</title> turned students from theology to law.
 </bibl>
 <bibl><author>McKnight</author>, <ref type="precedingWork">supra</ref> <ref type="footnote" n="2">note 2</ref>,
-  <citedRange unit="page">401</citedRange>. Note that the pagination of the various
-  editions of the <title level="m">Commentaries</title> has become more or less
-  standardized. This move is not without its problems, however.
+  <citedRange unit="page">401</citedRange>.
 </bibl>
-<bibl><seg type="citationContext">See</seg> <author>Alschuler</author>,
+<bibl><seg type="citationContext">Note that the pagination of the various
+  editions of the Commentaries has become more or less
+  standardized. This move is not without its problems, however. See</seg> <author>Alschuler</author>,
   <ref type="precedingWork">supra</ref> <ref type="footnote" n="1">note 1</ref>,
   <citedRange unit="page">3</citedRange> n.4;
 </bibl>
