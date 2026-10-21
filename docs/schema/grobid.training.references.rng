@@ -1023,7 +1023,9 @@
        mention of another work), <idno>/<authority>/<date>/<ref> are tagged
        in place inside the <title> rather than pulled out as siblings.
        @subtype="short" (TEI att.typed) marks an abbreviated/alternate
-       form of a title tagged in full elsewhere; @key links the two. -->
+       form of a title tagged in full elsewhere; @key links the two.
+       @xml:lang is only set when a translated title accompanies the
+       original; both titles then carry their language. -->
   <define name="references_title">
     <element name="title">
       <a:documentation>Title of the cited work.</a:documentation>
@@ -1066,6 +1068,11 @@
           <attribute name="type"><value datatypeLibrary="">caseName</value></attribute>
         </group>
       </choice>
+      <optional>
+        <attribute name="lang" ns="http://www.w3.org/XML/1998/namespace">
+          <a:documentation>Language of the title (BCP 47 code, e.g. "pl", "en"). Only set when the reference gives a translated title: then both the original title and its translation carry @xml:lang.</a:documentation>
+        </attribute>
+      </optional>
       <optional>
         <attribute name="subtype">
           <choice>

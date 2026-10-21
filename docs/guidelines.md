@@ -660,6 +660,25 @@ Web sources follow the same split: a website cited as a whole is `level="m"`, a 
 An optional `@key` holds a short resolvable key for a named work (e.g. an abbreviation),
 so it can later be linked to an external database.
 
+**Translated titles.** References to works in other languages often give a translation
+of the title next to the original, typically in square brackets. Annotate the original
+and the translation as two separate `<title>` elements with the same `@level`, and leave
+the brackets outside them. Both titles then carry `@xml:lang` with the language code
+([BCP 47](https://www.rfc-editor.org/info/bcp47), e.g. `pl`, `en`) of their text.
+`@xml:lang` is only added when a translated title is present; a title without a
+translation gets no `@xml:lang`.
+
+```xml
+<bibl><author>J. Chlebny</author>,
+  <title level="a" xml:lang="pl">Standardy Rady Europy i Europejskiego Trybunału Praw Człowieka w procedurze administracyjnej i sądowoadministracyjnej</title>
+  [<title level="a" xml:lang="en">Standards of the Council of Europe and of the European Court of Human Rights in Administrative and Administrative Court Procedure</title>],
+  [in:] <editor>Z. Kmieciak</editor> (ed.),
+  <title level="m" xml:lang="pl">Postępowanie administracyjne w Europie</title>
+  [<title level="m" xml:lang="en">Administrative Procedure in Europe</title>],
+  <pubPlace>Warszawa</pubPlace>: <publisher>Wolters Kluwer Polska</publisher> <date>2010</date>,
+  pp. <biblScope unit="page" from="31" to="42">31-42</biblScope>.</bibl>
+```
+
 **Dates.** `<date type="publication" when="...">` marks the publication date; `@when`
 holds [the machine-readable ISO form](https://web.uvic.ca/lancenrd/martin/guidelines/ref-att.datable.w3c.html) 
 when it can be determined, the text content the form as it appears in the source. 
