@@ -1141,9 +1141,9 @@ Mark the text that introduces a citation with a signal word ("see", "see also", 
 "but see", "contra", "vgl.", "anderer Ansicht" …) with `<seg type="citationContext">`:
 
 - The `<seg>` starts where the preceding citation (or the footnote label) ends and
-  ends after the signal word. It contains all of that text, which can be more than one
-  sentence, not only the signal word.
-- The citation that follows the signal stays outside the `<seg>`.
+  ends where the cited work itself begins (usually its author, editor or title). It
+  contains all text in between, which can be more than one sentence, including words
+  after the signal ("see, for example, the classic text by").
 - The `<seg>` holds plain text only: titles or names inside it are not tagged.
 - When several citations share one signal phrase, put the `<seg>` only in the first
   `<bibl>` it introduces (see the
