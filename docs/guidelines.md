@@ -1137,42 +1137,25 @@ post-processing; it is not required for training annotation.
 
 #### Citation-signal phrases
 
-Phrases that introduce a citation with an evaluative or directional stance — "See",
-"See also", "Cf.", "But see", "Contra", "vgl.", "anderer Ansicht" — carry citation-
-context information that is lost if the phrase is left as unlabeled prose. Mark the
-whole introductory phrase (not just a single trigger word) with
-`<seg type="citationContext">`:
+Mark the text that introduces a citation with a signal word ("see", "see also", "cf.",
+"but see", "contra", "vgl.", "anderer Ansicht" …) with `<seg type="citationContext">`:
+
+- The `<seg>` starts where the preceding citation (or the footnote label) ends and
+  ends after the signal word. It contains all of that text, which can be more than one
+  sentence, not only the signal word.
+- The citation that follows the signal stays outside the `<seg>`.
+- The `<seg>` holds plain text only: titles or names inside it are not tagged.
+- When several citations share one signal phrase, put the `<seg>` only in the first
+  `<bibl>` it introduces (see the
+  [pipeline example](#worked-example-the-full-annotation-pipeline) and the
+  referenceSegmenter's ["introductory comment" examples](#reference-segmentation-model)).
 
 ```xml
-<seg type="citationContext">For further analysis of the marriage contract, see</seg>
-<author>K. O'Donovan</author>, <title level="m">Family Matters</title>
-(<date type="publication">1993</date>), especially
-<citedRange unit="page" from="43" to="59">43–59</citedRange>.
+<!-- correct -->
+<seg type="citationContext">In the Polish literature -cf.</seg> <editor>Z. Kmieciak</editor>, …
+<!-- incorrect: the leading text is outside the <seg> -->
+In the Polish literature <seg type="citationContext">-cf.</seg> <editor>Z. Kmieciak</editor>, …
 ```
-
-The `<seg>` must contain the **complete** text leading up to the signal word ("see",
-"cf.", "vgl." …), not only the signal word or the words it starts. Start the `<seg>` at
-the beginning of the introductory text and end it after the signal. This text can be
-longer than one sentence. The `<seg>` holds plain text only, so titles or names
-mentioned in it are not tagged.
-
-Correct:
-
-```xml
-<seg type="citationContext">In the Polish literature -cf.</seg> <editor>Z. Kmieciak</editor>...
-```
-
-Incorrect (the leading text is left outside the `<seg>`):
-
-```xml
-In the Polish literature <seg type="citationContext">-cf.</seg> <editor>Z. Kmieciak</editor>...
-```
-
-`<seg type="citationContext">` does not include the citation that follows the signal. When several citations share one signal phrase, keep the phrase only in
-the first (or nearest) `<bibl>` it introduces — see the
-[pipeline example](#worked-example-the-full-annotation-pipeline) below and the
-referenceSegmenter's ["introductory comment" examples](#reference-segmentation-model)
-above.
 
 #### Quotations
 
