@@ -78,7 +78,7 @@ Rules:
 
 ## Citation model
 
-<!-- sync: guide=d467da394f419ca4bbdf57cbe6761c93cad9f915c6a2fec7408aad096daabdb3 llm=13f4b6f4efa50f0305911984ed861e20d810ed0dd7f5e571f0b88933d985f72c -->
+<!-- sync: guide=8fb50aec91ca03f283760d8dd981b6eb9320c33f0f1163f5b8bb0a751bca4cab llm=9ddd75e0b3e0b61bd6231399b9810141f68d3c137f9b39d684c96aa4cc18ec1d -->
 
 Labels the inside of each `<bibl>`. All elements except `<label>` and `<lb/>` may occur any number of times, in any order. Punctuation, "in:", brackets, "p."/"pp."/"S." and the like stay outside tags unless stated otherwise.
 
@@ -117,6 +117,7 @@ Labels the inside of each `<bibl>`. All elements except `<label>` and `<lb/>` ma
 - Non-numeric or mixed content (Roman numeral, attached `Rn.`/`§`/`Abs.`/`lit.`): add normalized `@n` (`<biblScope unit="volume" n="2">II</biblScope>`).
 - Real range: `@from` + `@to`. Only the start given (first page of an article): `@from` only. Never the same value in both.
 - `f.`/`et seq.`: `@from` = cited unit, `@to` = next unit. `ff.`/`et seqq.`: `@from` only. Applies to every unit.
+- Multi-day `<date>`: `@from` + `@to` (ISO, one per end of the range) instead of `@when`; text content stays as in the source. `<date from="2012-03-01" to="2012-03-02">1-2.03.2012</date>`. `@when` and `@from`/`@to` are mutually exclusive.
 
 ### Pinpoints (`<citedRange>`)
 

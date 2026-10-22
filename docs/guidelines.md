@@ -686,6 +686,18 @@ like `8.9.2016` — the content is no longer machine-readable on its own, so set
 to the converted ISO value. Only omit `@when` on such a date when the source genuinely
 does not pin down a resolvable date, e.g. "n.d.".
 
+**Date ranges.** When the cited date spans more than one day — a multi-day court
+session, a range given as e.g. "1-2.03.2012" — use `@from`/`@to` instead of `@when`,
+each holding the ISO form of its end of the range, with the text content kept as it
+appears in the source:
+
+```xml
+<date from="2012-03-01" to="2012-03-02">1-2.03.2012</date>
+```
+
+`@from`/`@to` and `@when` are mutually exclusive: `@when` marks a single point in time,
+`@from`/`@to` a span.
+
 **Extent.** `<biblScope unit="...">` carries the cited work's own extent — its volume,
 issue, or overall page range:
 
