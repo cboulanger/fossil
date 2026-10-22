@@ -1137,25 +1137,25 @@ post-processing; it is not required for training annotation.
 
 #### Citation-signal phrases
 
-Phrases that introduce a citation with an evaluative or directional stance — "See",
-"See also", "Cf.", "But see", "Contra", "vgl.", "anderer Ansicht" — carry citation-
-context information that is lost if the phrase is left as unlabeled prose. Mark the
-whole introductory phrase (not just a single trigger word) with
-`<seg type="citationContext">`:
+Mark the text that introduces a citation with a signal word ("see", "see also", "cf.",
+"but see", "contra", "vgl.", "anderer Ansicht" …) with `<seg type="citationContext">`:
+
+- The `<seg>` starts where the preceding citation (or the footnote label) ends and
+  ends where the cited work itself begins (usually its author, editor or title). It
+  contains all text in between, which can be more than one sentence, including words
+  after the signal ("see, for example, the classic text by").
+- The `<seg>` holds plain text only: titles or names inside it are not tagged.
+- When several citations share one signal phrase, put the `<seg>` only in the first
+  `<bibl>` it introduces (see the
+  [pipeline example](#worked-example-the-full-annotation-pipeline) and the
+  referenceSegmenter's ["introductory comment" examples](#reference-segmentation-model)).
 
 ```xml
-<seg type="citationContext">For further analysis of the marriage contract, see</seg>
-<author>K. O'Donovan</author>, <title level="m">Family Matters</title>
-(<date type="publication">1993</date>), especially
-<citedRange unit="page" from="43" to="59">43–59</citedRange>.
+<!-- correct -->
+<seg type="citationContext">In the Polish literature -cf.</seg> <editor>Z. Kmieciak</editor>, …
+<!-- incorrect: the leading text is outside the <seg> -->
+In the Polish literature <seg type="citationContext">-cf.</seg> <editor>Z. Kmieciak</editor>, …
 ```
-
-`<seg type="citationContext">` marks only the signal phrase itself, not the citation
-that follows it. When several citations share one signal phrase, keep the phrase only in
-the first (or nearest) `<bibl>` it introduces — see the
-[pipeline example](#worked-example-the-full-annotation-pipeline) below and the
-referenceSegmenter's ["introductory comment" examples](#reference-segmentation-model)
-above.
 
 #### Quotations
 
@@ -1188,11 +1188,11 @@ citations, each with its own signal phrase or `supra`-style back-reference:
   <title level="m">Commentaries</title> turned students from theology to law.
 </bibl>
 <bibl><author>McKnight</author>, <ref type="precedingWork">supra</ref> <ref type="footnote" n="2">note 2</ref>,
-  <citedRange unit="page">401</citedRange>. Note that the pagination of the various
-  editions of the <title level="m">Commentaries</title> has become more or less
-  standardized. This move is not without its problems, however.
+  <citedRange unit="page">401</citedRange>.
 </bibl>
-<bibl><seg type="citationContext">See</seg> <author>Alschuler</author>,
+<bibl><seg type="citationContext">Note that the pagination of the various
+  editions of the Commentaries has become more or less
+  standardized. This move is not without its problems, however. See</seg> <author>Alschuler</author>,
   <ref type="precedingWork">supra</ref> <ref type="footnote" n="1">note 1</ref>,
   <citedRange unit="page">3</citedRange> n.4;
 </bibl>
