@@ -279,16 +279,6 @@
     </element>
   </define>
 
-  <!-- ============================================================ -->
-  <!-- standOff: stand-off data next to teiHeader and text.           -->
-  <!-- Currently the review marks of the PDF-TEI-Editor's unit review  -->
-  <!-- mode, TEI/standOff/listAnnotation[@type="unit-review"], with    -->
-  <!-- one annotation[@motivation="assessing"] per reviewer. The notes -->
-  <!-- hold content fingerprints of the reviewed units (ok, was-ok:    -->
-  <!-- space-separated lists; not-ok, final-*, was-*: one note per    -->
-  <!-- unit, @n = fingerprint, content = comment). respStmt and note  -->
-  <!-- differ from the teiHeader versions, hence the standOff prefix. -->
-  <!-- ============================================================ -->
 
   <define name="standOff">
     <element name="standOff">
