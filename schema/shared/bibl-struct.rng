@@ -298,6 +298,12 @@
       <optional>
         <attribute name="when"/>
       </optional>
+      <optional>
+        <attribute name="from"/>
+      </optional>
+      <optional>
+        <attribute name="to"/>
+      </optional>
       <text/>
     </element>
   </define>
